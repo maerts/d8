@@ -1,0 +1,15 @@
+.sidebar-wrapper {
+    float: left;
+    width: 15%;
+    background-color: #e0e0d8;
+}
+.sidebar-wrapper aside {
+    background-color: #FFF;
+    margin-top: 114px;
+    border-top: 1px solid #999;
+    padding: 1em;
+}
+.content-wrapper {
+    float: left;
+    width: 85%;
+}
