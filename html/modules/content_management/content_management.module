@@ -1,0 +1,43 @@
+<?php
+
+use Drupal\Core\Url;
+use Drupal\Core\Link;
+use Drupal\views\ViewExecutable;
+
+/**
+ * Implements hook_views_pre_render().
+ * @param $view
+ */
+function content_management_views_pre_render(ViewExecutable $view) {
+  if ($view->id() == 'content_management') {
+    //kint();
+    // Build an easy to access content type array with human readable name.
+    $contentTypes = \Drupal::service('entity.manager')
+      ->getStorage('node_type')
+      ->loadMultiple();
+    $cts = array();
+    foreach ($contentTypes as $ct) {
+      $cts[$ct->id()] = $ct->label();
+    }
+
+    // Get the view parameter.
+    $arg = array_shift($view->args);
+
+    // Get the default empty message.
+    $empty = $view->empty['area']->options['content']['value'];
+    if (is_string($arg) && isset($cts[$arg])) {
+      $view->setTitle(t('Manage @ct content', array('@ct' => t($cts[$arg]))));
+      $view->empty['area']->options['content']['value'] = t($empty, array(
+          '@ct' => t($cts[$arg]),
+          '@create' => Link::fromTextAndUrl(t('Create'), Url::fromUri('internal:/node/add/' . $arg, array('query' => array('destination' => 'admin/content/cm/' . $arg))))
+            ->toString(),
+        )
+      );
+      // /node/add
+    }
+    else {
+      $view->setTitle(t('Error generating content management.'));
+      $view->empty['area']->options['content']['value'] = t("The content type you tried to reference doesn't exist. Please make sure it exists in the database.");
+    }
+  }
+}
