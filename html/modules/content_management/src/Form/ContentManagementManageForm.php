@@ -23,7 +23,7 @@ class ContentManagementManageForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   protected function getEditableConfigNames() {
-    return ['content_management.settings'];
+    return array('content_management.admin_settings');
   }
 
   /**

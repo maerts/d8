@@ -1,4 +1,4 @@
-content_management.settings:
+content_management.admin_settings:
   type: mapping
   label: 'Content Management config'
   mapping:

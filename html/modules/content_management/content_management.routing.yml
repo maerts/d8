@@ -1,5 +1,5 @@
 'content_management.admin_settings':
-  path: /admin/config/content-management
+  path: '/admin/config/user-interface/content-management'
   defaults:
     _form: '\Drupal\content_management\Form\ContentManagementManageForm'
     _title: 'Configure Content Management'
