@@ -30,7 +30,7 @@ class ContentManagementManageForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = $this->config('pathauto.settings');
+    $config = $this->config('content_management.admin_settings');
 
     $form['rebuild'] = array(
       '#type' => 'checkbox',
@@ -46,7 +46,7 @@ class ContentManagementManageForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $config = $this->config('pathauto.settings');
+    $config = $this->config('content_management.admin_settings');
     $form_state->cleanValues();
 
     foreach ($form_state->getValues() as $key => $value) {
