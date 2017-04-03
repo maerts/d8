@@ -4,7 +4,8 @@ namespace Drupal\panels\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Layout\LayoutPluginManagerInterface;
+use Drupal\layout_plugin\Layout;
+use Drupal\layout_plugin\Plugin\Layout\LayoutPluginManagerInterface;
 use Drupal\user\SharedTempStoreFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -16,7 +17,7 @@ class LayoutChangeRegions extends FormBase {
   /**
    * The layout plugin manager.
    *
-   * @var \Drupal\Core\Layout\LayoutPluginManagerInterface
+   * @var \Drupal\layout_plugin\Plugin\Layout\LayoutPluginManagerInterface
    */
   protected $manager;
 
@@ -32,7 +33,7 @@ class LayoutChangeRegions extends FormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('plugin.manager.core.layout'),
+      $container->get('plugin.manager.layout_plugin'),
       $container->get('user.shared_tempstore')
     );
   }
@@ -40,8 +41,8 @@ class LayoutChangeRegions extends FormBase {
   /**
    * LayoutChangeRegions constructor.
    *
-   * @param \Drupal\Core\Layout\LayoutPluginManagerInterface $manager
-   *   The layout plugin manager.
+   * @param \Drupal\layout_plugin\Plugin\Layout\LayoutPluginManagerInterface $manager
+   *   The layout plugin manager
    * @param \Drupal\user\SharedTempStoreFactory $tempstore
    *   The tempstore factory.
    */
@@ -71,7 +72,7 @@ class LayoutChangeRegions extends FormBase {
     $form['old_layout'] = [
       '#title' => $this->t('Old Layout'),
       '#type' => 'select',
-      '#options' => $this->manager->getLayoutOptions(),
+      '#options' => Layout::getLayoutOptions(['group_by_category' => TRUE]),
       '#default_value' => $cached_values['layout_change']['old_layout'],
       '#disabled' => TRUE,
     ];
@@ -79,14 +80,14 @@ class LayoutChangeRegions extends FormBase {
     $form['new_layout'] = [
       '#title' => $this->t('New Layout'),
       '#type' => 'select',
-      '#options' => $this->manager->getLayoutOptions(),
+      '#options' => Layout::getLayoutOptions(['group_by_category' => TRUE]),
       '#default_value' => $cached_values['layout_change']['new_layout'],
       '#disabled' => TRUE,
     ];
 
     $layout_settings = !empty($cached_values['layout_change']['layout_settings']) ? $cached_values['layout_change']['layout_settings'] : [];
-    $old_layout = $this->manager->createInstance($cached_values['layout_change']['old_layout'], []);
-    $new_layout = $this->manager->createInstance($cached_values['layout_change']['new_layout'], $layout_settings);
+    $old_layout = Layout::layoutPluginManager()->createInstance($cached_values['layout_change']['old_layout'], []);
+    $new_layout = Layout::layoutPluginManager()->createInstance($cached_values['layout_change']['new_layout'], $layout_settings);
 
     if ($block_assignments = $variant_plugin->getRegionAssignments()) {
       // Build a table of all blocks used by this variant.
@@ -106,7 +107,7 @@ class LayoutChangeRegions extends FormBase {
       ];
 
       // Loop through the blocks per region.
-      $new_regions = $new_layout->getPluginDefinition()->getRegionLabels();
+      $new_regions = $new_layout->getPluginDefinition()['region_names'];
       $new_regions['__unassigned__'] = $this->t('Unassigned');
       foreach ($new_regions as $region => $label) {
 
@@ -154,11 +155,10 @@ class LayoutChangeRegions extends FormBase {
         ];
       }
 
-      foreach ($old_layout->getPluginDefinition()->getRegions() as $region => $region_definition) {
+      foreach ($old_layout->getPluginDefinition()['region_names'] as $region => $label) {
         if (empty($block_assignments[$region])) {
           continue;
         }
-        $label = $region_definition['label'];
         // Prevent region names clashing with new regions.
         $region_id = 'old_'.$region;
 

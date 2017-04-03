@@ -24,7 +24,7 @@ class PanelsTest extends WebTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['block', 'page_manager', 'page_manager_ui', 'panels_test'];
+  public static $modules = ['block', 'page_manager', 'page_manager_ui', 'panels_test', 'layout_plugin_example'];
 
   /**
    * {@inheritdoc}
@@ -121,7 +121,7 @@ class PanelsTest extends WebTestBase {
 
     // Choose a simple layout.
     $edit = [
-      'layout' => 'layout_onecol',
+      'layout' => 'onecol',
     ];
     $this->drupalPostForm(NULL, $edit, 'Next');
 
